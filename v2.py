@@ -1,4 +1,4 @@
-#### v2 FIRMWARE ####
+#### v2m1 FIRMWARE ####
 #### By Aaren Stade ####
 #### 0.0.4 ####
 #### March 2021 ####
