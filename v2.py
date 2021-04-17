@@ -1,6 +1,6 @@
-#### v2m1 FIRMWARE ####
+#### v2 FIRMWARE ####
 #### By Aaren Stade ####
-#### 0.0.4 ####
+#### 0.0.5 ####
 #### March 2021 ####
 
 import os
@@ -11,38 +11,32 @@ import tkinter as tk
 from PIL import ImageTk, Image
 
 ######### CONSTANTS #########
-BILLBOARD_ID = os.environ.get("BILLBOARD_ID")
-config = {
-    "apiKey": "AIzaSyDNyQyZF2P7Rn6lOzYOKh-UHB5YPdWOb_I",
-    "authDomain": "mosaic-billboards.firebaseapp.com",
-    "databaseURL": "https://mosaic-billboards.firebaseio.com",
-    "projectId": "mosaic-billboards",
-    "storageBucket": "mosaic-billboards.appspot.com",
-}
-WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 720
-DISPLAY_TIME = 5000
-MAX_IMAGES = 5
+BILLBOARD_ID = os.environ.get('BILLBOARD_ID')
+FIREBASE_CONFIG = os.environ.get('FIREBASE_CONFIG')
+WINDOW_WIDTH = int(os.environ.get('WINDOW_WIDTH', 1200))
+WINDOW_HEIGHT = int(os.environ.get('WINDOW_HEIGHT', 1920))
 WORKING_DIR = "/home/v2-firmware/"
 IMAGES_PATH = os.path.join(WORKING_DIR, "images/")
 SCREENS_PATH = os.path.join(WORKING_DIR, "screens/")
+FIRMWARE_FILE = os.path.join(WORKING_DIR, "firmware.txt")
+DISPLAY_TIME = 5000
+MAX_IMAGES = 5
 
 ######### VARIABLES #########
 current_image = None
 label = None
-text_label = None
 image_list = []
 rot_index = 0
 
 root = tk.Tk()
-firebase = pyrebase.initialize_app(config)
+firebase = pyrebase.initialize_app(FIREBASE_CONFIG)
 db = firebase.database()
 
 class Root_Window(object):
     def __init__(self, master, **kwargs):
         self.tk = master
         self.tk.configure(background='black')
-        self.tk.title('v2m1')
+        self.tk.title('v2-process')
         self.tk.geometry(str(WINDOW_WIDTH) + 'x' + str(WINDOW_HEIGHT))
         self.tk.attributes('-fullscreen', True)
         self.frame = tk.Frame(self.tk)
@@ -63,6 +57,7 @@ def create_tk_image(path):
         img = ImageTk.PhotoImage(image=current_image)
         return img
     except:
+        print('image {} failed to open'.format(path), flush=True)
         return None
 
 def display_image(path):
@@ -89,6 +84,7 @@ def rotate_index():
         rot_index = 0
     else:
         rot_index = rot_index + 1
+    print('rotated index to {}'.format(rot_index), flush=True)
     return rot_index
 
 def check_connection(url='www.google.com', timeout=15):
@@ -96,8 +92,10 @@ def check_connection(url='www.google.com', timeout=15):
     try:
         req.request('HEAD', "/")
         req.close()
+        print('connected')
         return True
     except Exception as e:
+        print('no connection: {}'.format(e), flush=True)
         return False;
 
 def append_image_list(filename):
@@ -113,8 +111,9 @@ def download_image(filename, url):
         global image_list
         file_path = os.path.join(IMAGES_PATH, filename)
         request = requests.get(url, stream=True)
+        print('downloading image...', flush=True)
         if not request.ok:
-            return
+            print(request.text, flush=True)
         with open(file_path, 'wb') as img_file:
             for block in request.iter_content(1024):
                 if not block:
@@ -151,23 +150,8 @@ def query_for_new_ads():
     data = query.val()
     handle_query(data)
 
-def display_connection(has_connection):
-    global text_label
-    txt = ""
-    if (has_connection == True):
-        txt = "CONNECTED"
-    else:
-        txt = "NOT CONNECTED"
-
-    if (text_label == None):
-        text_label = tk.Label(root, text=txt, background='#fff', foreground="#000")
-    else:
-        text_label.configure(text=txt)
-    text_label.pack()
-
 def loop():
     has_connection = check_connection()
-    display_connection(has_connection)
     if (has_connection == True):
         if (rot_index == len(image_list)):
             display_image(os.path.join(SCREENS_PATH, 'upload.jpg'))
