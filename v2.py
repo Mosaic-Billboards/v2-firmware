@@ -158,18 +158,16 @@ def query_for_new_ads():
         handle_query(data)
 
 def loop():
+    if (rot_index != len(image_list)):
+        display_image(os.path.join(IMAGES_PATH, image_list[rot_index]))
+    else:
+        display_image(os.path.join(SCREENS_PATH, 'upload.jpg'))
     has_connection = check_connection()
     if (has_connection == True):
-        if (rot_index == len(image_list)):
-            display_image(os.path.join(SCREENS_PATH, 'upload.jpg'))
-        else:
-            display_image(os.path.join(IMAGES_PATH, image_list[rot_index]))
         query_for_new_ads()
-    else:
-        if (rot_index != len(image_list)):
-            display_image(os.path.join(IMAGES_PATH, image_list[rot_index]))
     rotate_index()
     root.after(DISPLAY_TIME, loop)
+
 
 def setup():
     Root_Window(root)
