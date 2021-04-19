@@ -10,16 +10,22 @@ import httplib2
 import tkinter as tk
 from PIL import ImageTk, Image
 
-######### CONSTANTS #########
-BILLBOARD_ID = os.environ.get('BILLBOARD_ID')
-FIREBASE_CONFIG = os.environ.get('FIREBASE_CONFIG')
-WINDOW_WIDTH = int(os.environ.get('WINDOW_WIDTH', 1200))
-WINDOW_HEIGHT = int(os.environ.get('WINDOW_HEIGHT', 1920))
+#####  q#### CONSTANTS #########
+FIREBASE_CONFIG = {
+    "apiKey": "AIzaSyDNyQyZF2P7Rn6lOzYOKh-UHB5YPdWOb_I",
+    "authDomain": "mosaic-billboards.firebaseapp.com",
+    "databaseURL": "https://mosaic-billboards.firebaseio.com",
+    "projectId": "mosaic-billboards",
+    "storageBucket": "mosaic-billboards.appspot.com",
+}
+BILLBOARD_ID = "v2m1-001"
+WINDOW_WIDTH = 1200
+WINDOW_HEIGHT = 1920
 WORKING_DIR = "/home/v2-firmware/"
 IMAGES_PATH = os.path.join(WORKING_DIR, "images/")
 SCREENS_PATH = os.path.join(WORKING_DIR, "screens/")
 FIRMWARE_FILE = os.path.join(WORKING_DIR, "firmware.txt")
-DISPLAY_TIME = 5000
+DISPLAY_TIME = 7000
 MAX_IMAGES = 5
 
 ######### VARIABLES #########
@@ -148,7 +154,8 @@ def handle_query(data):
 def query_for_new_ads():
     query = db.child(BILLBOARD_ID).get()
     data = query.val()
-    handle_query(data)
+    if (data != None):
+        handle_query(data)
 
 def loop():
     has_connection = check_connection()
