@@ -151,16 +151,6 @@ def delete_image(delete_filename):
 def handle_query(data):
     try:
         upload_id = data['image']['uuid']
-        upload_url = data['image']['url']
-        upload_filename = upload_id + '.jpg'
-        if not (upload_filename in image_list):
-            download_image(upload_filename, upload_url)
-    except:
-        pass
-
-def handle_query(data):
-    try:
-        upload_id = data['image']['uuid']
         upload_url = data['image']['image']
         upload_filename = upload_id + '.jpg'
         if not (upload_filename in image_list):
